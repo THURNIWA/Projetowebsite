@@ -1,0 +1,6 @@
+@FolderApi_HostAddress = http://localhost:5063
+
+GET {{FolderApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
