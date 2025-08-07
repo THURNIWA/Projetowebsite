@@ -37,3 +37,4 @@ C:\Users\aniwa\FolderApi\obj\Debug\net9.0\FolderApi.genruntimeconfig.cache
 C:\Users\aniwa\FolderApi\obj\Debug\net9.0\ref\FolderApi.dll
 C:\Users\aniwa\FolderApi\bin\Debug\net9.0\frontend\package-lock.json
 C:\Users\aniwa\FolderApi\bin\Debug\net9.0\frontend\package.json
+C:\Users\aniwa\FolderApi\obj\Debug\net9.0\FolderApi.sourcelink.json
