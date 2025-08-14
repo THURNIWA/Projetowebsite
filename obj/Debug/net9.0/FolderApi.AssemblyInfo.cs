@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FolderApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e3706625017ce5b18bd277215f28bbeed4fe6c46")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+86c8ebe85bce3ddf232ffa9e6160cc4247df1712")]
 [assembly: System.Reflection.AssemblyProductAttribute("FolderApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FolderApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

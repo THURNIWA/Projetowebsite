@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\aniwa\\FolderApi\\FolderApi.csproj": {}
+    "/Users/arthur/Projetowebsite/FolderApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\aniwa\\FolderApi\\FolderApi.csproj": {
+    "/Users/arthur/Projetowebsite/FolderApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\aniwa\\FolderApi\\FolderApi.csproj",
+        "projectUniqueName": "/Users/arthur/Projetowebsite/FolderApi.csproj",
         "projectName": "FolderApi",
-        "projectPath": "C:\\Users\\aniwa\\FolderApi\\FolderApi.csproj",
-        "packagesPath": "C:\\Users\\aniwa\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\aniwa\\FolderApi\\obj\\",
+        "projectPath": "/Users/arthur/Projetowebsite/FolderApi.csproj",
+        "packagesPath": "/Users/arthur/.nuget/packages/",
+        "outputPath": "/Users/arthur/Projetowebsite/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\aniwa\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/Users/arthur/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -51,6 +51,14 @@
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[9.0.4, )"
+            },
+            "Microsoft.IdentityModel.Tokens": {
+              "target": "Package",
+              "version": "[7.4.0, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[7.4.0, )"
             }
           },
           "imports": [
@@ -72,7 +80,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

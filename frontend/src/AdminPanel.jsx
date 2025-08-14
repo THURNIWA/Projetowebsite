@@ -42,6 +42,9 @@ function AdminPanel({ onLogout }) {
   })
   const [isSaving, setIsSaving] = useState(false)
   const [saveStatus, setSaveStatus] = useState('')
+  const [currentPhoto, setCurrentPhoto] = useState('')
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadStatus, setUploadStatus] = useState('')
 
   useEffect(() => {
     // Carregar conteúdo atual do localStorage ou API
@@ -49,7 +52,27 @@ function AdminPanel({ onLogout }) {
     if (savedContent) {
       setContent(JSON.parse(savedContent))
     }
+
+    // Carregar foto atual
+    loadCurrentPhoto()
   }, [])
+
+  const loadCurrentPhoto = async () => {
+    try {
+      const response = await fetch('/api/admin/current-photo', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setCurrentPhoto(data.imageUrl)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar foto atual:', error)
+    }
+  }
 
   const handleContentChange = (section, field, value) => {
     setContent(prev => ({
@@ -76,30 +99,85 @@ function AdminPanel({ onLogout }) {
     setContent(prev => ({ ...prev, services: newServices }))
   }
 
+  const handlePhotoUpload = async (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+
+    setIsUploading(true)
+    setUploadStatus('')
+
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const response = await fetch('/api/admin/upload-photo', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        },
+        body: formData
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setCurrentPhoto(data.imageUrl)
+        setUploadStatus('success')
+        setTimeout(() => setUploadStatus(''), 3000)
+      } else {
+        const errorData = await response.json()
+        setUploadStatus('error')
+        alert(errorData.message || 'Erro ao fazer upload da foto')
+      }
+    } catch (error) {
+      console.error('Erro ao fazer upload:', error)
+      setUploadStatus('error')
+      alert('Erro ao fazer upload da foto')
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
   const handleSave = async () => {
     setIsSaving(true)
     setSaveStatus('')
 
     try {
+      const token = localStorage.getItem('authToken')
+      console.log('Token:', token ? 'Presente' : 'Ausente')
+      console.log('Token completo:', token)
+      console.log('Dados a serem salvos:', content)
+
       const response = await fetch('/api/admin/content', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(content)
       })
 
+      console.log('Response status:', response.status)
+      console.log('Response headers:', response.headers)
+
       if (response.ok) {
+        const result = await response.json()
+        console.log('Resposta de sucesso:', result)
         localStorage.setItem('siteContent', JSON.stringify(content))
         setSaveStatus('success')
         setTimeout(() => setSaveStatus(''), 3000)
       } else {
+        const errorData = await response.json()
+        console.error('Erro na resposta:', errorData)
+        console.error('Status code:', response.status)
         setSaveStatus('error')
+        alert(`Erro ${response.status}: ${errorData.message || 'Erro ao salvar dados'}`)
       }
     } catch (error) {
       console.error('Erro ao salvar:', error)
+      console.error('Tipo do erro:', error.name)
+      console.error('Mensagem do erro:', error.message)
       setSaveStatus('error')
+      alert(`Erro de conexão: ${error.message}`)
     } finally {
       setIsSaving(false)
     }
@@ -117,6 +195,42 @@ function AdminPanel({ onLogout }) {
       <div className="admin-content">
         <div className="container">
           <div className="admin-sections">
+            {/* Upload de Foto */}
+            <section className="admin-section">
+              <h2>Foto do Perfil</h2>
+              <div className="photo-upload-section">
+                {currentPhoto && (
+                  <div className="current-photo">
+                    <img src={currentPhoto} alt="Foto atual" />
+                    <p>Foto atual</p>
+                  </div>
+                )}
+                <div className="upload-controls">
+                  <input
+                    type="file"
+                    id="photo-upload"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    disabled={isUploading}
+                    style={{ display: 'none' }}
+                  />
+                  <label htmlFor="photo-upload" className="upload-btn">
+                    {isUploading ? 'Enviando...' : 'Escolher Nova Foto'}
+                  </label>
+                  <p className="upload-info">
+                    Formatos aceitos: JPG, PNG, GIF<br />
+                    Tamanho máximo: 5MB
+                  </p>
+                  {uploadStatus === 'success' && (
+                    <p className="success-message">Foto enviada com sucesso!</p>
+                  )}
+                  {uploadStatus === 'error' && (
+                    <p className="error-message">Erro ao enviar foto. Tente novamente.</p>
+                  )}
+                </div>
+              </div>
+            </section>
+
             {/* Informações Básicas */}
             <section className="admin-section">
               <h2>Informações Básicas</h2>

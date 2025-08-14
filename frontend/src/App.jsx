@@ -7,26 +7,80 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
   const [showLogin, setShowLogin] = useState(false)
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: ''
+  const [currentPhoto, setCurrentPhoto] = useState('')
+  const [siteContent, setSiteContent] = useState({
+    name: 'Tamy Niwa',
+    title: 'Personal Trainer Profissional',
+    description: 'Transforme seu corpo e sua vida com treinos personalizados e acompanhamento especializado',
+    about: [
+      'Treinos, motivação, lifestyle CF LV1 trainer Cwb gymnastic LV1 Liberacao Miofascia.',
+      'Allan Joseph X-mobillity - mobilidade',
+      'Pós graduação: Alta Performance em Prescrição de Treinos e Exercícios: Hipertrofia, Saúde e Emagrecimento',
+      '"Manter o corpo em boa saúde é um dever… caso contrário, não seremos capazes de manter nossa mente forte e clara".  - Buda'
+    ],
+    services: [
+      {
+        title: 'Treino Presencial',
+        description: 'Acompanhamento individualizado com treinos personalizados na academia ou ao ar livre.',
+        features: ['Avaliação física completa', 'Treinos personalizados', 'Acompanhamento nutricional básico', 'Suporte via WhatsApp']
+      },
+      {
+        title: 'Treino Online',
+        description: 'Treinos personalizados para você fazer em casa ou na academia com acompanhamento remoto.',
+        features: ['Treinos personalizados', 'Vídeos explicativos', 'Acompanhamento semanal', 'Suporte 24/7']
+      },
+      {
+        title: 'Consultoria',
+        description: 'Orientação especializada para otimizar seus treinos e resultados.',
+        features: ['Análise de treinos', 'Dicas de nutrição', 'Planejamento de metas', 'Suporte por 30 dias']
+      }
+    ],
+    contact: {
+      whatsapp: '(11) 99999-9999',
+      instagram: '@tamyniwa_personal',
+      email: 'tamyniwa@gmail.com'
+    },
+    stats: {
+      clients: '100+',
+      experience: '5+',
+      commitment: '100%'
+    }
   })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState(null)
   const [activeTab, setActiveTab] = useState('sobre')
 
-  // Verificar se já está logado
+  // Verificar se já está logado e carregar dados
   useEffect(() => {
     const token = localStorage.getItem('authToken')
     const userData = localStorage.getItem('userData')
-    
+
     if (token && userData) {
       setIsAuthenticated(true)
       setUser(JSON.parse(userData))
     }
+
+    // Carregar dados do servidor
+    loadSiteData()
   }, [])
+
+  const loadSiteData = async () => {
+    try {
+      // Carregar foto atual
+      const photoResponse = await fetch('/api/admin/current-photo')
+      if (photoResponse.ok) {
+        const photoData = await photoResponse.json()
+        setCurrentPhoto(photoData.imageUrl)
+      }
+
+      // Carregar conteúdo do site
+      const contentResponse = await fetch('/api/admin/content')
+      if (contentResponse.ok) {
+        const contentData = await contentResponse.json()
+        setSiteContent(contentData)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error)
+    }
+  }
 
   const handleLogin = (userData) => {
     setIsAuthenticated(true)
@@ -39,206 +93,6 @@ function App() {
     localStorage.removeItem('userData')
     setIsAuthenticated(false)
     setUser(null)
-  }
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setSubmitStatus(null)
-
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      })
-
-      if (response.ok) {
-        setSubmitStatus('success')
-        setFormData({ name: '', email: '', phone: '', message: '' })
-      } else {
-        setSubmitStatus('error')
-      }
-    } catch (error) {
-      console.error('Erro ao enviar mensagem:', error)
-      setSubmitStatus('error')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'sobre':
-        return (
-          <div className="tab-content">
-            <h2>Sobre Mim</h2>
-            <div className="card sobre-mim-text">
-              <p>
-                Treinos, motivação, lifestyle CF LV1 trainer Cwb gymnastic LV1 Liberacao Miofascia.
-              </p>
-              <p>
-                Allan Joseph X-mobillity - mobilidade
-              </p>
-              <p>
-                Pós graduação: Alta Performance em Prescrição de Treinos e Exercícios: Hipertrofia, Saúde e Emagrecimento
-              </p>
-              <p>
-                "Manter o corpo em boa saúde é um dever… caso contrário, não seremos capazes de manter nossa mente forte e clara".  - Buda
-              </p>
-              <div className="stats">
-                <div className="stat">
-                  <h3>100+</h3>
-                  <p>Clientes Atendidos</p>
-                </div>
-                <div className="stat">
-                  <h3>5+</h3>
-                  <p>Anos de Experiência</p>
-                </div>
-                <div className="stat">
-                  <h3>100%</h3>
-                  <p>Compromisso</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )
-      
-      case 'servicos':
-        return (
-          <div className="tab-content">
-            <h2>Meus Serviços</h2>
-            <div className="services-grid">
-              <div className="service-card">
-                <h3>Treino Presencial</h3>
-                <p>Acompanhamento individualizado com treinos personalizados na academia ou ao ar livre.</p>
-                <ul>
-                  <li>Avaliação física completa</li>
-                  <li>Treinos personalizados</li>
-                  <li>Acompanhamento nutricional básico</li>
-                  <li>Suporte via WhatsApp</li>
-                </ul>
-              </div>
-              <div className="service-card">
-                <h3>Treino Online</h3>
-                <p>Treinos personalizados para você fazer em casa ou na academia com acompanhamento remoto.</p>
-                <ul>
-                  <li>Treinos personalizados</li>
-                  <li>Vídeos explicativos</li>
-                  <li>Acompanhamento semanal</li>
-                  <li>Suporte 24/7</li>
-                </ul>
-              </div>
-              <div className="service-card">
-                <h3>Consultoria</h3>
-                <p>Orientação especializada para otimizar seus treinos e resultados.</p>
-                <ul>
-                  <li>Análise de treinos</li>
-                  <li>Dicas de nutrição</li>
-                  <li>Planejamento de metas</li>
-                  <li>Suporte por 30 dias</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        )
-      
-      case 'contato':
-        return (
-          <div className="tab-content">
-            <h2>Entre em Contato</h2>
-            <div className="contact-content">
-              <div className="contact-info">
-                <h3>Vamos conversar sobre seus objetivos?</h3>
-                <p>Preencha o formulário ao lado e eu entrarei em contato em até 24 horas.</p>
-                <div className="contact-details">
-                  <div className="contact-item">
-                    <strong>WhatsApp:</strong> (11) 99999-9999
-                  </div>
-                  <div className="contact-item">
-                    <strong>Instagram:</strong> @tamyniwa_personal
-                  </div>
-                  <div className="contact-item">
-                    <strong>Email:</strong> tamyniwa@gmail.com
-                  </div>
-                </div>
-              </div>
-              <div className="contact-form">
-                <form onSubmit={handleSubmit}>
-                  <div className="form-group">
-                    <label htmlFor="name">Nome Completo *</label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      required
-                      placeholder="Seu nome completo"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="email">Email *</label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                      placeholder="seu@email.com"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="phone">Telefone</label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      placeholder="(11) 99999-9999"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="message">Mensagem *</label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      required
-                      placeholder="Conte-me sobre seus objetivos e como posso te ajudar..."
-                    />
-                  </div>
-                  <button type="submit" className="btn" disabled={isSubmitting}>
-                    {isSubmitting ? 'Enviando...' : 'Enviar Mensagem'}
-                  </button>
-                  {submitStatus === 'success' && (
-                    <p className="success-message">Mensagem enviada com sucesso! Entrarei em contato em breve.</p>
-                  )}
-                  {submitStatus === 'error' && (
-                    <p className="error-message">Erro ao enviar mensagem. Tente novamente ou entre em contato diretamente.</p>
-                  )}
-                </form>
-              </div>
-            </div>
-          </div>
-        )
-      
-      default:
-        return null
-    }
   }
 
   // Se estiver autenticado, mostrar painel administrativo
@@ -259,28 +113,28 @@ function App() {
         <div className="container">
           <nav className="nav">
             <div className="nav-brand">
-              <span className="brand-text">Tamy Niwa</span>
+              <span className="brand-text">{siteContent.name}</span>
             </div>
             <div className="nav-menu">
-              <button 
+              <button
                 className={`nav-btn ${activeTab === 'sobre' ? 'active' : ''}`}
                 onClick={() => setActiveTab('sobre')}
               >
                 Sobre Mim
               </button>
-              <button 
+              <button
                 className={`nav-btn ${activeTab === 'servicos' ? 'active' : ''}`}
                 onClick={() => setActiveTab('servicos')}
               >
                 Meus Serviços
               </button>
-              <button 
+              <button
                 className={`nav-btn ${activeTab === 'contato' ? 'active' : ''}`}
                 onClick={() => setActiveTab('contato')}
               >
                 Contato
               </button>
-              <button 
+              <button
                 className="nav-btn admin-btn"
                 onClick={() => setShowLogin(true)}
                 title="Área Administrativa"
@@ -292,40 +146,145 @@ function App() {
         </div>
       </header>
 
-      {/* Header/Hero Section */}
-      <section className="hero">
-        <div className="container">
-          <div className="hero-content">
-            <div className="hero-photo">
-              <div className="photo-placeholder">
-                <span>📸</span>
-                <p>Foto do Personal Trainer</p>
-                <small>Adicione sua foto aqui</small>
+      {/* Conteúdo dinâmico baseado na aba ativa */}
+      {activeTab === 'sobre' && (
+        <>
+          {/* Hero Section apenas para a página inicial */}
+          <section className="hero">
+            <div className="container">
+              <div className="hero-content">
+                <div className="hero-photo">
+                  {currentPhoto ? (
+                    <img src={currentPhoto} alt={`${siteContent.name} - Personal Trainer`} className="profile-photo" />
+                  ) : (
+                    <div className="photo-placeholder">
+                      <span>📸</span>
+                      <p>Foto do Personal Trainer</p>
+                      <small>Adicione sua foto aqui</small>
+                    </div>
+                  )}
+                </div>
+                <div className="hero-text">
+                  <h1>{siteContent.name}</h1>
+                  <h2>{siteContent.title}</h2>
+                  <p>{siteContent.description}</p>
+                  <button onClick={() => setActiveTab('contato')} className="btn">Entre em Contato</button>
+                </div>
               </div>
             </div>
-            <div className="hero-text">
-              <h1>Tamy Niwa</h1>
-              <h2>Personal Trainer Profissional</h2>
-              <p>Transforme seu corpo e sua vida com treinos personalizados e acompanhamento especializado</p>
-              <button onClick={() => setActiveTab('contato')} className="btn">Entre em Contato</button>
+          </section>
+
+          {/* Sobre Mim */}
+          <section className="tabs-section">
+            <div className="container">
+              <div className="tabs-content">
+                <div className="tab-content">
+                  <h2>Sobre Mim</h2>
+                  <div className="card sobre-mim-text">
+                    {siteContent.about.map((text, index) => (
+                      <p key={index}>{text}</p>
+                    ))}
+                    <div className="stats">
+                      <div className="stat">
+                        <h3>{siteContent.stats.clients}</h3>
+                        <p>Clientes Atendidos</p>
+                      </div>
+                      <div className="stat">
+                        <h3>{siteContent.stats.experience}</h3>
+                        <p>Anos de Experiência</p>
+                      </div>
+                      <div className="stat">
+                        <h3>{siteContent.stats.commitment}</h3>
+                        <p>Compromisso</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </>
+      )}
+
+      {activeTab === 'servicos' && (
+        <section className="tabs-section">
+          <div className="container">
+            <div className="tabs-content">
+              <div className="tab-content">
+                <h2>Meus Serviços</h2>
+                <div className="services-grid">
+                  {siteContent.services.map((service, index) => (
+                    <div key={index} className="service-card">
+                      <h3>{service.title}</h3>
+                      <p>{service.description}</p>
+                      <ul>
+                        {service.features.map((feature, featureIndex) => (
+                          <li key={featureIndex}>{feature}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Tabs Content */}
-      <section className="tabs-section">
-        <div className="container">
-          <div className="tabs-content">
-            {renderTabContent()}
+      {activeTab === 'contato' && (
+        <section className="tabs-section">
+          <div className="container">
+            <div className="tabs-content">
+              <div className="tab-content">
+                <h2>Entre em Contato</h2>
+                <div className="contact-content">
+                  <div className="contact-info">
+                    <h3>Vamos conversar sobre seus objetivos?</h3>
+                    <p>Preencha o formulário ao lado e eu entrarei em contato em até 24 horas.</p>
+                    <div className="contact-details">
+                      <div className="contact-item">
+                        <strong>WhatsApp:</strong> {siteContent.contact.whatsapp}
+                      </div>
+                      <div className="contact-item">
+                        <strong>Instagram:</strong> {siteContent.contact.instagram}
+                      </div>
+                      <div className="contact-item">
+                        <strong>Email:</strong> {siteContent.contact.email}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="contact-form">
+                    <form>
+                      <div className="form-group">
+                        <label htmlFor="name">Nome</label>
+                        <input type="text" id="name" name="name" required />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="email">Email</label>
+                        <input type="email" id="email" name="email" required />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="phone">Telefone</label>
+                        <input type="tel" id="phone" name="phone" />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="message">Mensagem</label>
+                        <textarea id="message" name="message" rows="4" required></textarea>
+                      </div>
+                      <button type="submit" className="btn">Enviar Mensagem</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Footer */}
       <footer className="footer">
         <div className="container">
-          <p>&copy; 2024 Tamy Niwa - Personal Trainer. Todos os direitos reservados.</p>
+          <p>&copy; 2024 {siteContent.name} - Personal Trainer. Todos os direitos reservados.</p>
         </div>
       </footer>
     </div>
